@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./backend
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/seat_booking
+      - CLIENT_URL=http://localhost:5173
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    environment:
+      - VITE_API_URL=http://backend:4000/api
+      - VITE_SOCKET_URL=http://backend:4000
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
+
+
